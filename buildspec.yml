@@ -4,10 +4,10 @@ phases:
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
-      - $(aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 698355729228.dkr.ecr.us-east-2.amazonaws.com)
+      - PASSWORD=$(aws ecr get-login-password --region us-east-2)
+      - docker login --username AWS --password $PASSWORD 698355729228.dkr.ecr.us-east-2.amazonaws.com/eks-lab-5
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - IMAGE_TAG=${COMMIT_HASH:=latest}
-
   build:
     commands:
       - echo Build started on `date`
@@ -18,10 +18,12 @@ phases:
   post_build:
     commands:
       - echo Updating Kubernetes deployment...
-      - sed -i "s|698355729228.dkr.ecr.us-east-2.amazonaws.com/eks-lab-5:.*|698355729228.dkr.ecr.us-east-2.amazonaws.com/eks-lab-5:${IMAGE_TAG}|g" deployment.yaml
-      - aws eks update-kubeconfig --region us-east-2 --name <EKS_CLUSTER_NAME>
+      - sed -i "s|<IMAGE_PLACEHOLDER>|698355729228.dkr.ecr.us-east-2.amazonaws.com/eks-lab-5:${IMAGE_TAG}|g" deployment.yaml
+      - aws eks update-kubeconfig --region us-east-2 --name eks-labs
       - kubectl apply -f deployment.yaml
+      - kubectl apply -f service.yaml
 
 cache:
   paths:
     - '/root/.cache/pip/*'
+
