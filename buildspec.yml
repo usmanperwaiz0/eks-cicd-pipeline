@@ -5,28 +5,22 @@ phases:
     commands:
       - echo Logging in to Amazon ECR...
       - aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 698355729228.dkr.ecr.us-east-2.amazonaws.com
-      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
-      - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F":" '{print $2}')
-      - export REPOSITORY_URI="698355729228.dkr.ecr.us-east-2.amazonaws.com/eks-lab-5"
+      - echo Building the Docker image...
+      - docker build -t eks-lab-5 .
   build:
     commands:
-      - echo Build started on `date`
-      - echo Building the Docker image...
-      - docker build -t $REPOSITORY_URI:latest .
-      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
-      - echo "Pushing Docker image..."
-      - docker push $REPOSITORY_URI:$IMAGE_TAG || (echo "Failed to push Docker image" && exit 1)
-
+      - echo Pushing the Docker image...
+      - docker tag eks-lab-5 698355729228.dkr.ecr.us-east-2.amazonaws.com/eks-lab-5:latest
+      - docker push 698355729228.dkr.ecr.us-east-2.amazonaws.com/eks-lab-5
+      - echo Updating the image in the Kubernetes deployment...
+      - sed -i.bak 's|698355729228.dkr.ecr.us-east-2.amazonaws.com/eks-lab-5|698355729228.dkr.ecr.us-east-2.amazonaws.com/eks-lab-5|g' deployment.yaml
   post_build:
     commands:
-      - echo Updating Kubernetes deployment...
-      - - aws eks update-kubeconfig --region us-east-2 --name eks-labs || (echo "Failed to update kubeconfig" && exit 1)
-      - sed -i "s|<IMAGE_PLACEHOLDER>|698355729228.dkr.ecr.us-east-2.amazonaws.com/eks-lab-5:${IMAGE_TAG}|g" deployment.yaml
-      - aws eks update-kubeconfig --region us-east-2 --name eks-labs
+      - echo Applying Kubernetes manifests...
       - kubectl apply -f deployment.yaml
       - kubectl apply -f service.yaml
 
-cache:
-  paths:
-    - '/root/.cache/pip/*'
-
+artifacts:
+  files: 
+    - deployment.yaml
+    - service.yaml
