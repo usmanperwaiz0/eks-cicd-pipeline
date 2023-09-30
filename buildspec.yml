@@ -3,24 +3,38 @@ version: 0.2
 phases:
   pre_build:
     commands:
+      # AWS CLI install karna
+      - curl "https://d1vvhvl2y92vvt.cloudfront.net/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+      - unzip awscliv2.zip
+      - sudo ./aws/install
+      - aws --version
+      # AWS CLI configure karna
+      - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+      - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+      - aws configure set default.region us-east-2
+      - aws configure set default.output json
+      # Docker image ko build aur ECR mein push karne ke liye AWS CLI ka configuration set karna
       - echo Logging in to Amazon ECR...
       - aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 698355729228.dkr.ecr.us-east-2.amazonaws.com
-      - echo Building the Docker image...
-      - docker build -t eks-lab-5 .
+      # kubectl install karne ke liye
+      - curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+      - sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+      - chmod +x kubectl && mv kubectl /usr/local/bin/
   build:
     commands:
+      # Docker image ko build karna
+      - echo Building the Docker image...
+      - docker build -t eks-lab-5 .
+      # Docker image ko AWS ECR mein push karna
       - echo Pushing the Docker image...
       - docker tag eks-lab-5 698355729228.dkr.ecr.us-east-2.amazonaws.com/eks-lab-5:latest
       - docker push 698355729228.dkr.ecr.us-east-2.amazonaws.com/eks-lab-5
-      - echo Updating the image in the Kubernetes deployment...
       - sed -i.bak 's|698355729228.dkr.ecr.us-east-2.amazonaws.com/eks-lab-5|698355729228.dkr.ecr.us-east-2.amazonaws.com/eks-lab-5|g' deployment.yaml
-  post_build:
+    post_build:
     commands:
+      # AWS CLI ko EKS cluster se connect karne ke liye configure karna
+      - aws eks update-kubeconfig --region $AWS_DEFAULT_REGION --name eks-labs
+      # Kubernetes manifests ko apply karna, jisse pods create honge EKS mein
       - echo Applying Kubernetes manifests...
       - kubectl apply -f deployment.yaml
       - kubectl apply -f service.yaml
-
-artifacts:
-  files: 
-    - deployment.yaml
-    - service.yaml
