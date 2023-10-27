@@ -30,14 +30,14 @@ phases:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...
-      - docker build -t eks-repo .
-      - docker tag eks-repo:latest 587027614473.dkr.ecr.us-east-1.amazonaws.com/eks-repo:latest
+      - docker build -t ecr .
+      - docker tag ecr:latest 587027614473.dkr.ecr.us-east-1.amazonaws.com/ecr:latest
 
   post_build:
     commands:
       - echo Build completed on `date`
       - echo Pushing the Docker image...
-      - docker push 587027614473.dkr.ecr.us-east-1.amazonaws.com/eks-repo:latest
+      - docker push 587027614473.dkr.ecr.us-east-1.amazonaws.com/ecr:latest
       - echo Updating kubeconfig...
       - aws eks update-kubeconfig --region us-east-1 --name eks
       - echo Deploying to Kubernetes cluster...
