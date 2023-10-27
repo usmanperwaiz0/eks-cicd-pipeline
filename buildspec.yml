@@ -41,7 +41,7 @@ phases:
       - echo Updating kubeconfig...
       - aws eks update-kubeconfig --region us-east-1 --name eks
       - echo Deploying to Kubernetes cluster...
-    - kubectl apply -f k8s-deployment.yml || echo "kubectl command failed"
+      - kubectl apply -f k8s-deployment.yml --v=9 || echo "kubectl command failed"
 
 artifacts:
   files: k8s-deployment.yml
