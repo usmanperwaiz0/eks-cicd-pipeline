@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: my-app
-        image: 587027614473.dkr.ecr.us-east-1.amazonaws.com/eks-repo
+        image: 587027614473.dkr.ecr.us-east-1.amazonaws.com/ecr
         ports:
         - containerPort: 80
         imagePullPolicy: Always  # or "IfNotPresent" or "Never"
