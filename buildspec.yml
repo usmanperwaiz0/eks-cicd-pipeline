@@ -36,12 +36,12 @@ phases:
       - echo Pushing the Docker image...
       - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 587027614473.dkr.ecr.us-east-1.amazonaws.com
       - docker push 587027614473.dkr.ecr.us-east-1.amazonaws.com/ecr-eks-app:latest
-      - echo Updating kubeconfig...
-      - aws eks update-kubeconfig --region us-east-1 --name eks
-      - kubectl get nodes
+#      - echo Updating kubeconfig...
+#      - aws eks update-kubeconfig --region us-east-1 --name eks
+#      - kubectl get nodes
 #      - echo Deploying to Kubernetes cluster...
 #      - kubectl apply -f k8s-deployment.yml
 #      - kubectl get deployment
-artifacts:
-  files: k8s-deployment.yml
+#artifacts:
+#  files: k8s-deployment.yml
 
