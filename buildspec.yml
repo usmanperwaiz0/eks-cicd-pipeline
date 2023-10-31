@@ -41,6 +41,7 @@ phases:
       - kubectl get nodes
       - echo Deploying to Kubernetes cluster...
       - kubectl apply -f k8s-deployment.yml
+      - kubectl replace --force -f k8s-deployment.yml
       - kubectl get deployment
 
 
