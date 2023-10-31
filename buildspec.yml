@@ -27,6 +27,7 @@ phases:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...
+      - echo dckr_pat_5IyhSP4dCDWcSgU9hYDp1Z3Et9o | docker login --username alnafidocker --password-stdin
       - docker build -t ecr-eks-app .
       - docker tag ecr-eks-app:latest 587027614473.dkr.ecr.us-east-1.amazonaws.com/ecr-eks-app:latest
 
