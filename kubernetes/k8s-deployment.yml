@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: my-app
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: my-app
@@ -17,7 +17,7 @@ spec:
         image: nginx
         ports:
         - containerPort: 80
-        imagePullPolicy: IfNotPresent      # Always  # or "IfNotPresent" or "Never"
+        imagePullPolicy: Always      # Always  # or "IfNotPresent" or "Never"
 ---
 apiVersion: v1
 kind: Service
