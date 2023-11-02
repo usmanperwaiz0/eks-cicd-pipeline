@@ -17,7 +17,7 @@ spec:
         image: nginx
         ports:
         - containerPort: 80
-        imagePullPolicy: IfNotPresent # Always  # or "IfNotPresent" or "Never"
+        imagePullPolicy: Always # Always  # or "IfNotPresent" or "Never"
 ---
 apiVersion: v1
 kind: Service
