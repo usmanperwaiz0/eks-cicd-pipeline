@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: my-app
-        image: nginx
+        image: 587027614473.dkr.ecr.us-east-1.amazonaws.com/ecr-eks-app
         ports:
         - containerPort: 80
         imagePullPolicy: Always # Always  # or "IfNotPresent" or "Never"
