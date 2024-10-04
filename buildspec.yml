@@ -1,3 +1,11 @@
+#********************WORK FLOW********************
+#1)- Install the necessary tools for build process.
+#2)- Login the docker account.
+#3)- Build by dockerfile and tag the docker image.
+#4)- Login into the ECR by docker command
+#5)- Push the tagged image to ECR.
+#6)- Deploy the app on EKS cluster by manifest file.
+
 version: 0.2
 
 phases:
@@ -30,7 +38,7 @@ phases:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...
-      - echo dckr_pat_5IyhSP4dCDWcSgU9hYDp1Z3Et9o | docker login --username alnafidocker --password-stdin
+      - echo <DOCKER PERSONAL ACCESS TOKEN HERE> | docker login --username <DOCKER USERNAME> --password-stdin
       - docker build -t sample-app . 
       - docker tag sample-app:latest 940461185630.dkr.ecr.us-east-1.amazonaws.com/sample-app:latest
 
@@ -41,11 +49,12 @@ phases:
       ###############The following command is used to authenticate your Docker client with your Amazon ECR registry so you can push or pull Docker images to and from ECR.
       - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 940461185630.dkr.ecr.us-east-1.amazonaws.com
       ###############
+      - docker images
       - docker push 940461185630.dkr.ecr.us-east-1.amazonaws.com/sample-app:latest || (echo "docker push failed" && exit 1)
       # Scan the image with Clair
-      - echo Scanning the Docker image with Clair...
-      - clair-scanner --ip 54.209.191.96 -r clair_report.json -l clair_log.json --threshold="Critical" 587027614473.dkr.ecr.us-east-1.amazonaws.com/cicd-integrate-clair_and_ecr:latest || (echo "clair-scanner failed" && exit 1)
-      - echo Clair scanning completed
+      #- echo Scanning the Docker image with Clair...
+      #- clair-scanner --ip 54.209.191.96 -r clair_report.json -l clair_log.json --threshold="Critical" 587027614473.dkr.ecr.us-east-1.amazonaws.com/cicd-integrate-clair_and_ecr:latest || (echo "clair-scanner failed" && exit 1)
+      #- echo Clair scanning completed
       - echo Updating kubeconfig...
       - aws eks update-kubeconfig --region us-east-1 --name eks
       - kubectl config current-context
